@@ -1,121 +1,128 @@
 #include <iostream>
+#include <vector>
 
 using namespace std;
+
+#define VERTICES 999999
 
 class Graph
 {
 private:
+    struct Node
+    {
+        int data;
+        struct Node *next;
+    };
     int no_of_vertices;
-    int no_of_edges;
-    int **adj_matrix;
+    struct Node **adj_list;
 
 public:
-    void make_graph(int no_of_vertices, int no_of_edges);
-    void add_edge();
-    void isConnected(int x, int y);
+    bool visited[VERTICES] = {0};
+    void make_graph(int no_of_vertices);
+    void display(int y);
+    void add_edge(int i, int j);
+    void dfs(int v);
 };
 
-void Graph ::make_graph(int no_of_vertices, int no_of_edges)
+void Graph ::add_edge(int i, int j)
 {
-    this->no_of_vertices = no_of_vertices;
-    this->no_of_edges = no_of_edges;
 
-    // creating a graph
-    adj_matrix = new int *[no_of_vertices];
-    for (int i = 0; i < no_of_vertices; i++)
+    if (adj_list[i] == NULL)
     {
-        adj_matrix[i] = new int[no_of_vertices];
-        // initializing all the elements of graph
-        for (int j = 0; j < no_of_vertices; j++)
-        {
-            adj_matrix[i][j] = 0;
-        }
-    }
-}
-
-void Graph ::add_edge()
-{
-    for (int i = 0; i < no_of_edges; i++)
-    {
-        int temp_i, temp_j;
-        cin >> temp_i >> temp_j;
-        adj_matrix[temp_i - 1][temp_j - 1] = 1;
-    }
-}
-
-void Graph ::isConnected(int x, int y)
-{
-    /* Initializing a array to keep a record of families of each vertex
-    index 0 of array means 0th vertex and so on*/
-    int sets[no_of_vertices];
-    for (int i = 0; i < no_of_vertices; i++)
-    {
-        sets[i] = i; // This step makes all the vertices a parent of themselves
-    }
-
-    while (no_of_edges--)
-    {
-        /*we run the while loop for the total no of edges*/
-        /*first we find the edge with the minimum weight*/
-        int temp_i = 0, temp_j = 0;
-        for (int i = 0; i < no_of_vertices; i++)
-        {
-            for (int j = 0; j < no_of_vertices; j++)
-            {
-                if (adj_matrix[i][j] > 0)
-                {
-
-                    temp_i = i;
-                    temp_j = j;
-
-                    int temp_1 = sets[temp_i];
-                    int temp_2 = sets[temp_j];
-
-                    if (sets[temp_i] != sets[temp_j])
-                    {
-                        for (int i = 0; i < no_of_vertices; i++)
-                        {
-                            /*Convert the entire family of second vertex to first family*/
-                            if (sets[i] == temp_2)
-                            {
-                                sets[i] = temp_1;
-                            }
-                        }
-                    }
-
-                    adj_matrix[temp_i][temp_j] = 0; // we have made cost of that path 0 to avoid recomparison
-                }
-                else
-                {
-                    continue;
-                }
-            }
-        }
-    }
-
-    if (sets[x] == sets[y])
-    {
-        cout << "1";
+        adj_list[i] = new struct Node;
+        adj_list[i]->data = j;
+        adj_list[i]->next = NULL;
     }
     else
     {
-        cout << "0";
+        struct Node *temp;
+        temp = adj_list[i];
+        while (temp->next != NULL)
+        {
+            temp = temp->next;
+        }
+        temp->next = new struct Node;
+        temp->next->data = j;
+        temp->next->next = NULL;
     }
+
+    if (adj_list[j] == NULL)
+    {
+        adj_list[j] = new struct Node;
+        adj_list[j]->data = i;
+        adj_list[j]->next = NULL;
+    }
+    else
+    {
+        struct Node *temp;
+        temp = adj_list[j];
+        while (temp->next != NULL)
+        {
+            temp = temp->next;
+        }
+        temp->next = new struct Node;
+        temp->next->data = i;
+        temp->next->next = NULL;
+    }
+}
+// end of function
+
+void Graph ::dfs(int v)
+{
+    visited[v] = 1;
+
+    struct Node *temp;
+    temp = adj_list[v];
+
+    while (temp != NULL)
+    {
+        if (visited[temp->data] == 0)
+        {
+            dfs(temp->data);
+        }
+        temp = temp->next;
+    }
+}
+
+void Graph ::make_graph(int no_of_vertices)
+{
+    this->no_of_vertices = no_of_vertices;
+    // creating a graph
+    adj_list = new struct Node *[no_of_vertices];
+    for (int i = 0; i < no_of_vertices; i++)
+    {
+        adj_list[i] = NULL;
+    }
+}
+
+void Graph ::display(int y)
+{
+    cout << visited[y] ;
 }
 
 int main()
 {
     Graph g;
-    int no_of_vertices, no_of_edges;
-    cin >> no_of_vertices >> no_of_edges;
+    int no_of_vertices;
+    cin >> no_of_vertices;
+    int no_of_edges;
+    cin >> no_of_edges;
 
-    g.make_graph(no_of_vertices, no_of_edges);
-    g.add_edge();
+    g.make_graph(no_of_vertices);
 
-    int source, destination;
-    cin >> source >> destination;
+    for (int i = 0; i < no_of_edges; i++)
+    {
+        int x, y;
+        cin >> x >> y;
+        g.add_edge(x - 1, y - 1);
+    }
 
-    g.isConnected(source - 1, destination - 1);
+    int x, y;
+    cin >> x >> y ;
+    g.dfs(x-1) ;
+
+    g.display(y-1);
 
     return 0;
 }
+// end of main

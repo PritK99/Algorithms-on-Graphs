@@ -12,7 +12,7 @@ private:
 public:
     void make_graph(int no_of_vertices, int no_of_edges);
     void add_edge();
-    void kruskals();
+    void isConnected(int x, int y);
 };
 
 void Graph ::make_graph(int no_of_vertices, int no_of_edges)
@@ -43,7 +43,7 @@ void Graph ::add_edge()
     }
 }
 
-void Graph ::kruskals()
+void Graph ::isConnected(int x, int y)
 {
     /* Initializing a array to keep a record of families of each vertex
     index 0 of array means 0th vertex and so on*/
@@ -55,7 +55,9 @@ void Graph ::kruskals()
 
     while (no_of_edges--)
     {
-        int temp_i = 0, temp_j = 0 , temp_k = 0 , temp_l = 0 ;
+        /*we run the while loop for the total no of edges*/
+        /*first we find the edge with the minimum weight*/
+        int temp_i = 0, temp_j = 0;
         for (int i = 0; i < no_of_vertices; i++)
         {
             for (int j = 0; j < no_of_vertices; j++)
@@ -66,16 +68,10 @@ void Graph ::kruskals()
                     temp_i = i;
                     temp_j = j;
 
-                    temp_k = i;
-                    temp_l = j;
-
                     int temp_1 = sets[temp_i];
                     int temp_2 = sets[temp_j];
 
-                    // int temp_3 = sets[temp_i];
-                    // int temp_4 = sets[temp_j];
-
-                    if (sets[temp_i] != sets[temp_j] )
+                    if (sets[temp_i] != sets[temp_j])
                     {
                         for (int i = 0; i < no_of_vertices; i++)
                         {
@@ -86,18 +82,6 @@ void Graph ::kruskals()
                             }
                         }
                     }
-                    else
-                    {
-                        cout << 1 ;
-                        exit(0) ;
-                    }
-
-                    cout << "for " << temp_i << " and " << temp_j << " : ";
-                    for (int i = 0 ; i < no_of_vertices ; i++)
-                    {
-                        cout << sets[i] << " " ;
-                    }
-                    cout << endl ;
 
                     adj_matrix[temp_i][temp_j] = 0; // we have made cost of that path 0 to avoid recomparison
                 }
@@ -108,9 +92,17 @@ void Graph ::kruskals()
             }
         }
     }
+
+    if (sets[x] == sets[y])
+    {
+        cout << "1";
+    }
+    else
+    {
+        cout << "0";
+    }
 }
 
-// main function starts here
 int main()
 {
     Graph g;
@@ -119,8 +111,11 @@ int main()
 
     g.make_graph(no_of_vertices, no_of_edges);
     g.add_edge();
-    g.kruskals() ;
+
+    int source, destination;
+    cin >> source >> destination;
+
+    g.isConnected(source - 1, destination - 1);
 
     return 0;
 }
-// end of main

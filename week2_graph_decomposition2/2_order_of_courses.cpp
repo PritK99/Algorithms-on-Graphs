@@ -34,15 +34,18 @@ void Graph ::add_edge(int i, int j)
     adj_list[i]->data = j;
     adj_list[i]->next = NULL;
   }
-  struct Node *temp;
-  temp = adj_list[i];
-  while (temp->next != NULL)
+  else
   {
-    temp = temp->next;
+    struct Node *temp;
+    temp = adj_list[i];
+    while (temp->next != NULL)
+    {
+      temp = temp->next;
+    }
+    temp->next = new struct Node;
+    temp->next->data = j;
+    temp->next->next = NULL;
   }
-  temp->next = new struct Node;
-  temp->next->data = j;
-  temp->next->next = NULL;
 }
 // end of function
 
@@ -62,7 +65,7 @@ void Graph ::dfs(int v)
     temp = temp->next;
   }
   // cout << v ;
-  order.push_back(v+1);
+  order.push_back(v + 1);
 }
 
 void Graph ::make_graph(int no_of_vertices)
@@ -99,7 +102,7 @@ int main()
   {
     int x, y;
     cin >> x >> y;
-    g.add_edge(x-1, y-1);
+    g.add_edge(x - 1, y - 1);
   }
 
   for (int v = 0; v < no_of_vertices; v++)

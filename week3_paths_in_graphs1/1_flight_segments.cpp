@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 
 using namespace std;
 
@@ -15,14 +14,31 @@ private:
     };
     int no_of_vertices;
     struct Node **adj_list;
+    int *queue = NULL;
+    int *head = NULL;
+    int *tail = NULL;
+    int count = 1;
 
 public:
-    bool visited[VERTICES] = {0};
+    int visited[VERTICES] = {0};
     void make_graph(int no_of_vertices);
     void display(int y);
     void add_edge(int i, int j);
-    void dfs(int v);
+    void bfs(int v);
 };
+
+void Graph ::make_graph(int no_of_vertices)
+{
+    this->no_of_vertices = no_of_vertices;
+    adj_list = new struct Node *[no_of_vertices];
+    queue = new int[no_of_vertices];
+    head = &queue[0];
+    tail = &queue[0];
+    for (int i = 0; i < no_of_vertices; i++)
+    {
+        adj_list[i] = NULL;
+    }
+}
 
 void Graph ::add_edge(int i, int j)
 {
@@ -67,39 +83,47 @@ void Graph ::add_edge(int i, int j)
 }
 // end of function
 
-void Graph ::dfs(int v)
+void Graph ::bfs(int v)
 {
-    visited[v] = 1;
+    *tail = v;
+    tail++;
+    visited[v] = count;
+    count++;
 
-    struct Node *temp;
-    temp = adj_list[v];
-
-    while (temp != NULL)
+    while (head != tail)
     {
-        if (visited[temp->data] == 0)
+        struct Node *temp;
+        temp = adj_list[*head];
+        head++;
+
+        while (temp != NULL)
         {
-            dfs(temp->data);
+            if (visited[temp->data] == 0)
+            {
+                *tail = temp->data;
+                visited[temp->data] = count;
+                tail++;
+            }
+            temp = temp->next;
         }
-        temp = temp->next;
-    }
-}
-
-void Graph ::make_graph(int no_of_vertices)
-{
-    this->no_of_vertices = no_of_vertices;
-    // creating a graph
-    adj_list = new struct Node *[no_of_vertices];
-    for (int i = 0; i < no_of_vertices; i++)
-    {
-        adj_list[i] = NULL;
+        count++;
     }
 }
 
 void Graph ::display(int y)
 {
-    cout << visited[y] ;
+    if (visited[y] == 0)
+    {
+        cout << -1;
+    }
+    else
+    {
+        cout << visited[y] - 1;
+    }
 }
+// end of function
 
+// main function starts here
 int main()
 {
     Graph g;
@@ -118,10 +142,10 @@ int main()
     }
 
     int x, y;
-    cin >> x >> y ;
-    g.dfs(x-1) ;
+    cin >> x >> y;
+    g.bfs(x - 1);
 
-    g.display(y-1);
+    g.display(y - 1);
 
     return 0;
 }

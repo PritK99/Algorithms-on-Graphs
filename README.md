@@ -29,7 +29,7 @@ In this representation all the vertices connected to a vertex v are listed on A 
 
 Adjacency list are useful to represent sparse graphs.
 
-<img src="../assets/Graph_Representations.png" alt="Graph Representation">
+<img src="/assets/Graph_Representations.png" alt="Graph Representation">
 
 # Graph Traversals
 Two ways to traverse a graph are :-

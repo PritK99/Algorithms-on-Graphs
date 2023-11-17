@@ -1,58 +1,84 @@
 #include <iostream>
+#include <limits>
 #include <vector>
-#include <climits>
+#include <queue>
+#include <set>
 
+using std::pair;
+using std::priority_queue;
+using std::queue;
+using std::set;
 using std::vector;
 
-vector<int> negative_cycle(vector<vector<int>> &adj, vector<vector<int>> &cost, int s)
+void bfs(vector<vector<int>> &adj, vector<int> &reachable, queue<int> q, vector<bool> visited)
 {
+  set<int> s;
+
+  while (!q.empty())
+  {
+    int node = q.front();
+    q.pop();
+    s.insert(node);
+
+    for (int i = 0; i < adj[node].size(); i++)
+    {
+      if (visited[adj[node][i]] == 0)
+      {
+        q.push(adj[node][i]);
+        visited[adj[node][i]] = 1;
+      }
+    }
+  }
+
+  for (auto it : s)
+  {
+    reachable[it] = 1;
+  }
+}
+
+void shortest_paths(vector<vector<int>> &adj, vector<vector<int>> &cost, int s, vector<long long> &distance, vector<int> &reachable, vector<int> &shortest)
+{
+  queue<int> q;
   int v = adj.size();
-  vector<bool> visited(v);
+  distance[s] = 0;
+  vector<bool> visited(adj.size());
 
-  vector<int> dist(v, INT_MAX);
-  dist[s] = 0;
-
-  for (int k = 0; k < v - 1; k++)
+  // Outer loop runs for |V| times
+  for (int i = 0; i < v; i++)
   {
-    // Run v-1 interations
-
-    for (int i = 0; i < v; i++)
+    // Inner loops for iterating over all edges
+    for (int j = 0; j < adj.size(); j++)
     {
-      for (int j = 0; j < adj[i].size(); j++)
+      if (distance[j] == std::numeric_limits<long long>::max())
       {
-        if (dist[i] + cost[i][j] < dist[adj[i][j]] && dist[i] != INT_MAX)
+        continue;
+      }
+
+      for (int k = 0; k < adj[j].size(); k++)
+      {
+        if (distance[j] != std::numeric_limits<long long>::max() && distance[adj[j][k]] > distance[j] + cost[j][k])
         {
-          dist[adj[i][j]] = dist[i] + cost[i][j];
+          // Edge Relaxation
+          if (i == v - 1)
+          {
+            q.push(adj[j][k]);
+            visited[adj[j][k]] = 1;
+          }
+          else
+          {
+            distance[adj[j][k]] = distance[j] + cost[j][k];
+          }
         }
       }
     }
   }
 
-  while(1)
-  {
-    vector <int> temp = dist;
-    for (int i = 0; i < v; i++)
-    {
-      for (int j = 0; j < adj[i].size(); j++)
-      {
-        if (dist[i] == INT_MIN || dist[i] + cost[i][j] < dist[adj[i][j]])
-        {
-          dist[adj[i][j]] = INT_MIN;
-        }
-      }
-    }
-    if (temp == dist)
-    {
-      break;
-    }
-  }
-
-  return dist;
+  bfs(adj, reachable, q, visited);
 }
 
 int main()
 {
-  int n, m;
+  int n, m, s;
   std::cin >> n >> m;
   vector<vector<int>> adj(n, vector<int>());
   vector<vector<int>> cost(n, vector<int>());
@@ -63,24 +89,25 @@ int main()
     adj[x - 1].push_back(y - 1);
     cost[x - 1].push_back(w);
   }
-  int s;
   std::cin >> s;
-  vector<int> dist = negative_cycle(adj, cost, s-1);
-
-  for (int i = 0; i < dist.size(); i++)
+  s--;
+  vector<long long> distance(n, std::numeric_limits<long long>::max());
+  vector<int> reachable(n, 0);
+  vector<int> shortest(n, 1);
+  shortest_paths(adj, cost, s, distance, reachable, shortest);
+  for (int i = 0; i < n; i++)
   {
-    if (dist[i] == INT_MAX)
+    if (reachable[i] == 1)
     {
-      std::cout << "*";
+      std::cout << "-\n";
     }
-    else if (dist[i] == INT_MIN)
+    else if (distance[i] == std::numeric_limits<long long>::max())
     {
-      std::cout << "-";
+      std::cout << "*\n";
     }
     else
     {
-      std::cout << dist[i];
+      std::cout << distance[i] << "\n";
     }
-    std::cout << std::endl;
   }
 }
